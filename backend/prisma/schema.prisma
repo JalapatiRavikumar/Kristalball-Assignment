@@ -1,0 +1,97 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  role      Role     @default(LOGISTICS_OFFICER)
+  baseId    String?
+  base      Base?    @relation(fields: [baseId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  BASE_COMMANDER
+  LOGISTICS_OFFICER
+}
+
+model Base {
+  id          String   @id @default(uuid())
+  name        String
+  location    String
+  users       User[]
+  transactions InventoryTransaction[]
+  transfersFrom Transfer[] @relation("TransferFrom")
+  transfersTo   Transfer[] @relation("TransferTo")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model EquipmentType {
+  id           String                 @id @default(uuid())
+  category     String                 // e.g., "Vehicle", "Weapon", "Ammunition"
+  name         String
+  transactions InventoryTransaction[]
+  transfers    Transfer[]
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+}
+
+model InventoryTransaction {
+  id              String          @id @default(uuid())
+  type            TransactionType
+  baseId          String
+  base            Base            @relation(fields: [baseId], references: [id])
+  equipmentTypeId String
+  equipmentType   EquipmentType   @relation(fields: [equipmentTypeId], references: [id])
+  quantity        Int
+  personnelId     String?         // Used if type == ASSIGNMENT
+  transferId      String?         // Link to Transfer record if TRANSFER_IN/OUT
+  userId          String          // User who initiated this action
+  createdAt       DateTime        @default(now())
+}
+
+enum TransactionType {
+  OPENING_BALANCE
+  PURCHASE
+  TRANSFER_IN
+  TRANSFER_OUT
+  ASSIGNMENT
+  EXPENDITURE
+}
+
+model Transfer {
+  id              String         @id @default(uuid())
+  fromBaseId      String
+  fromBase        Base           @relation("TransferFrom", fields: [fromBaseId], references: [id])
+  toBaseId        String
+  toBase          Base           @relation("TransferTo", fields: [toBaseId], references: [id])
+  equipmentTypeId String
+  equipmentType   EquipmentType  @relation(fields: [equipmentTypeId], references: [id])
+  quantity        Int
+  status          TransferStatus @default(COMPLETED)
+  userId          String
+  createdAt       DateTime       @default(now())
+}
+
+enum TransferStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  details   Json
+  createdAt DateTime @default(now())
+}
