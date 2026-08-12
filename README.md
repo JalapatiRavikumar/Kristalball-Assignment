@@ -12,7 +12,12 @@ A comprehensive, role-based military asset management dashboard built with React
 - **Dynamic Dashboard:** Real-time metrics and Recharts visualizations (Inventory Trends, Equipment Breakdowns) that instantly update based on base and equipment filters.
 - **Modern UI/UX:** Sleek dark-mode aesthetic with Lucide icons, glassmorphism, smooth animations, and fully responsive CSS-Grid layouts.
 
-## 🚀 Quick Start
+## 🚀 Live Demo
+
+The application is deployed live on Vercel and fully functional:
+🔗 **[Kristallball Asset Management - Live App](https://frontend-ten-alpha-67.vercel.app)**
+
+## 💻 Local Setup
 
 ### Frontend (React/Vite)
 ```bash
